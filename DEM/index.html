@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Untitled Document</title>
+
+    <style>
+        body {
+            margin: none;
+            background-color: #CCC;
+        }
+
+        #container {
+            /*background-color: #044675;*/
+            background-color: #CCC;
+            width: 100%;
+            height: 100%;
+            margin: auto;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div id="container"></div>
+
+    <script src="js/jquery.min.js"></script>
+
+    <script src="js/three.js"></script>
+    <script src="js/OrbitControls.js"></script>
+    <script src="js/JsonDemLoader6.js"></script>
+
+    <script type="text/javascript">
+        //var jsonDemLoader = new JsonDemLoader("data/pyrenee.json");
+        //var jsonDemLoader = new JsonDemLoader("data/himalaya.json");
+        var jsonDemLoader = new JsonDemLoader("data/himalaya_mini.json");
+        //var jsonDemLoader = new JsonDemLoader("data/imageData1000x1000.json");
+        //var jsonDemLoader = new JsonDemLoader("data/imageData10x15.json");
+        //var jsonDemLoader = new JsonDemLoader("data/imageData300x400.json");
+
+        var controls = null;
+        var renderer = null;
+        var scene = null;
+        var camera = null;
+        var pointLight = null;
+        var lightAnimationRadius = 0;
+        var step = 0;
+
+        function animate() {
+            requestAnimationFrame(animate); // about 60fps
+            render();
+        }
+
+        function render() {
+            rotateLight();
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        function rotateLight() {
+            step += 0.01;
+            pointLight.position.x = lightAnimationRadius * Math.cos(step);
+            pointLight.position.z = lightAnimationRadius * Math.sin(step);
+        }
+
+        function init() {
+            var $container = $('#container');
+
+            // set the scene size
+            var WIDTH = $container.width();
+            var HEIGHT = $container.height();
+
+            // set some camera attributes
+            var VIEW_ANGLE = 45;
+            var ASPECT = WIDTH / HEIGHT;
+            var NEAR = 0.1;
+            var FAR = 10000;
+
+            // renderer, camera and a scene
+            renderer = new THREE.WebGLRenderer({
+                antialias: true,
+                alpha: true
+            });
+            camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
+            scene = new THREE.Scene();
+
+            camera.position.set(0, 150, 300);
+            scene.add(camera);
+
+            // start the renderer
+            renderer.setSize(WIDTH, HEIGHT);
+
+            // adding the controls
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            // necessary only if there is no animation
+            //controls.addEventListener( 'change', render );
+
+            // attach the render-supplied DOM element
+            $container.append(renderer.domElement);
+
+            /******************* OBJECT AND MATERIALS *************************/
+
+            //var material = new THREE.MeshLambertMaterial( {
+            var material = new THREE.MeshPhongMaterial({
+                color: 0xFFFFFF,
+                emissive: 0x000000, // darkest color
+                side: THREE.DoubleSide,
+                shading: THREE.FlatShading,
+                vertexColors: THREE.FaceColors // mandatory for face color changing
+            });
+
+            var geometry = new THREE.Geometry();
+
+            // loads the geometry from json DEM
+            jsonDemLoader.buildGeometry(geometry);
+            //jsonDemLoader.adjustPosition();
+
+            geometry.translate(-(jsonDemLoader.getSceneWidth() / 2), 0, -(jsonDemLoader.getSceneHeight() / 2));
+
+            geometry.computeFaceNormals();
+            scene.add(new THREE.Mesh(geometry, material));
+
+
+            /**************************** LIGHT *******************************/
+
+            // add subtle ambient lighting
+            var ambiColor = "#444444";
+            var ambientLight = new THREE.AmbientLight(ambiColor);
+            scene.add(ambientLight);
+
+
+            // create a point light
+            pointLight = new THREE.PointLight(0xFFFFFF);
+
+            lightAnimationRadius = Math.min(jsonDemLoader.getSceneWidth(), jsonDemLoader.getSceneHeight()) / 2;
+
+            // set its position
+            pointLight.position.x = lightAnimationRadius;
+            pointLight.position.y = jsonDemLoader.getScaledDemDeltaHeight() * 4;
+            pointLight.position.z = lightAnimationRadius;
+
+            // add to the scene
+            scene.add(pointLight);
+
+        }
+
+        init();
+        animate();
+    </script>
+
+</body>
+
+</html>

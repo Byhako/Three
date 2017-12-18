@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Triangulo.js</title>
+    <style>canvas { width: 100%; height: 100% }</style>
+</head>
+<body>
+    <script src="http://mrdoob.github.com/three.js/build/three.js"></script>  <!--Incluyendo la biblioteca-->
+    <script>
+
+//************ Escena ****************
+    var scene = new THREE.Scene();              // Creando el objeto escena, donde se añadirán los demás.
+
+//*********** Cámara ****************
+
+    var camera = new THREE.PerspectiveCamera(  // PerspectiveCamera, StereoCamera, OrthographicCamera y CubeCamera
+    30,                                        // Ángulo de "grabación" de abajo hacia arriba en grados.
+    window.innerWidth/window.innerHeight,      // Relación de aspecto de la ventana de la cámara(Ejemplo: 16:9).
+    0.1,                                       // Plano de recorte cercano (más cerca no se renderiza).
+    1000                                       // Plano de recorte lejano  (más lejos no se renderiza).
+    );
+
+    camera.position.z = 5;  //Enviar la cámara hacia atrás para poder ver la geometría. Por defecto es z = 0.
+//  camera.position.set(x, y, z);
+//********** Renderizador  ************
+
+    var renderer = new THREE.WebGLRenderer({antialias:true}); // Utilizar el renderizador WebGL.
+    renderer.setSize(window.innerWidth, window.innerHeight);  // Renderizador del tamaño de la ventana.
+    document.body.appendChild(renderer.domElement);           // Añadir el renderizador al elemento DOM body.
+
+//********* Geometría ****************
+
+    // Punto
+    var starsGeometry = new THREE.Geometry();
+    starsGeometry.vertices.push(new THREE.Vector3(0, 0.6, 0));
+    
+    var starsMaterial = new THREE.PointsMaterial( { color: 0xf4df5a } );
+    var starField = new THREE.Points( starsGeometry, starsMaterial );
+
+    scene.add( starField );
+
+    // Techo
+    var triangleGeometry = new THREE.Geometry();
+    triangleGeometry.vertices.push(new THREE.Vector3(-0.6, 0, 0));
+    triangleGeometry.vertices.push(new THREE.Vector3(0, 0.5, 0));
+    triangleGeometry.vertices.push(new THREE.Vector3(0.6, 0, 0));
+    triangleGeometry.faces.push(new THREE.Face3(0, 1, 2));
+
+    var triangleMaterial = new THREE.MeshBasicMaterial({
+        color: 0xA93434,
+        side: THREE.DoubleSide  //FrontSide,  BackSide
+    });
+
+    var triangulo = new THREE.Mesh(triangleGeometry, triangleMaterial);
+    scene.add(triangulo);
+
+    // Pared
+    var cuadroGeometry = new THREE.Geometry();
+    cuadroGeometry.vertices.push(new THREE.Vector3(-0.5, 0, 0));
+    cuadroGeometry.vertices.push(new THREE.Vector3(0.5, 0, 0));
+    cuadroGeometry.vertices.push(new THREE.Vector3(0.5, -1, 0));
+    cuadroGeometry.faces.push(new THREE.Face3(0, 1, 2));
+
+    cuadroGeometry.vertices.push(new THREE.Vector3(-0.5, 0, 0));
+    cuadroGeometry.vertices.push(new THREE.Vector3(-0.5, -1, 0));
+    cuadroGeometry.vertices.push(new THREE.Vector3(0.5, -1, 0));
+    cuadroGeometry.faces.push(new THREE.Face3(3, 4, 5));
+    
+    var cuadroMaterial = new THREE.MeshBasicMaterial({
+        color: 0xEACA3F,
+        side: THREE.DoubleSide
+    });
+
+    var cuadro = new THREE.Mesh(cuadroGeometry, cuadroMaterial);
+    scene.add(cuadro);
+
+    // Puerta
+    var puertaGeometry = new THREE.Geometry();
+    puertaGeometry.vertices.push(new THREE.Vector3(-0.15, -1, 0));
+    puertaGeometry.vertices.push(new THREE.Vector3(0.15, -1, 0));
+    puertaGeometry.vertices.push(new THREE.Vector3(-0.15, -0.6, 0));
+    puertaGeometry.faces.push(new THREE.Face3(0, 1, 2));
+
+    puertaGeometry.vertices.push(new THREE.Vector3(-0.15, -0.6, 0));
+    puertaGeometry.vertices.push(new THREE.Vector3(0.15, -0.6, 0));
+    puertaGeometry.vertices.push(new THREE.Vector3(0.15, -1, 0));
+    puertaGeometry.faces.push(new THREE.Face3(3, 4, 5));
+
+    var puertaMaterial = new THREE.MeshBasicMaterial({
+        color: 0x592D0A,
+        side: THREE.DoubleSide
+    });
+
+    var puerta = new THREE.Mesh(puertaGeometry, puertaMaterial);
+    scene.add(puerta);
+
+    // ventana derecha
+    var ventanaDereGeometry = new THREE.Geometry();
+    ventanaDereGeometry.vertices.push(new THREE.Vector3(0.15, -0.4, 0));
+    ventanaDereGeometry.vertices.push(new THREE.Vector3(0.15, -0.15, 0));
+    ventanaDereGeometry.vertices.push(new THREE.Vector3(0.4, -0.15, 0));
+    ventanaDereGeometry.faces.push(new THREE.Face3(0, 1, 2));
+
+    ventanaDereGeometry.vertices.push(new THREE.Vector3(0.15, -0.4, 0));
+    ventanaDereGeometry.vertices.push(new THREE.Vector3(0.4, -0.4, 0));
+    ventanaDereGeometry.vertices.push(new THREE.Vector3(0.4, -0.15, 0));
+    ventanaDereGeometry.faces.push(new THREE.Face3(3, 4, 5));
+
+    var ventanaMaterial = new THREE.MeshBasicMaterial({
+        color: 0x1090E5,
+        side: THREE.DoubleSide
+    });
+
+    var ventanaDere = new THREE.Mesh(ventanaDereGeometry, ventanaMaterial);
+    scene.add(ventanaDere);
+
+    // ventana izquierda
+    var ventanaIzGeometry = new THREE.Geometry();
+    ventanaIzGeometry.vertices.push(new THREE.Vector3(-0.15, -0.4, 0));
+    ventanaIzGeometry.vertices.push(new THREE.Vector3(-0.15, -0.15, 0));
+    ventanaIzGeometry.vertices.push(new THREE.Vector3(-0.4, -0.15, 0));
+    ventanaIzGeometry.faces.push(new THREE.Face3(0, 1, 2));
+
+    ventanaIzGeometry.vertices.push(new THREE.Vector3(-0.15, -0.4, 0));
+    ventanaIzGeometry.vertices.push(new THREE.Vector3(-0.4, -0.4, 0));
+    ventanaIzGeometry.vertices.push(new THREE.Vector3(-0.4, -0.15, 0));
+    ventanaIzGeometry.faces.push(new THREE.Face3(3, 4, 5));
+
+    var ventanaIz = new THREE.Mesh(ventanaIzGeometry, ventanaMaterial);
+    scene.add(ventanaIz);
+//************* Luz (requerida para el material MeshLambertMaterial)
+
+    var light = new THREE.PointLight( 0xFFFF00 ); //  Luz proveniente de un punto en el espacio, 
+                                                  //  semejante al sol.
+    light.position.set( -10, 5, 10 );             //  Localización de la luz. (x, y, z).
+    scene.add( light );                           //  Añadir la luz al objeto escena.
+
+//*********** Función para renderizar ***********
+    var render = function () {
+    requestAnimationFrame(render);           // la renderización ocurrirá continuamente si la escena está visible.
+    renderer.render(scene, camera);          //Renderizar escena cada vez que se ejecuta la función "render()".
+    };
+
+    render();
+
+    </script>
+</body>
+</html>
